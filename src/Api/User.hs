@@ -27,7 +27,6 @@ type UserAPI =
 userServer :: ServerT UserAPI App
 userServer = allUsers :<|> singleUser :<|> createUser
 
-
 allUsers :: App [User]
 allUsers = do
     users <- runDb (selectList [] [])
@@ -40,14 +39,17 @@ singleUser str = do
     maybeUserRow <- runDb (selectFirst [UserRowName ==. str] [])
     let maybeUser = fmap (userToUser . entityVal) maybeUserRow
     case maybeUser of
-         Nothing     -> throwError err404
+         Nothing -> throwError err404
          Just user -> return user
 
 
 createUser :: User -> App Int64
 createUser p = do
-    newUser <- runDb (insert (UserRow (name p) (email p)))
-    return $ fromSqlKey newUser
+    let maybeRow = userToRow p
+    case maybeRow of
+         Nothing -> throwError err400
+         Just row -> do newUser <- runDb (insert row)
+                        return $ fromSqlKey newUser
 
 generateJavaScript :: IO ()
 generateJavaScript = writeJSForAPI (Proxy :: Proxy UserAPI) vanillaJS "./assets/api.js"

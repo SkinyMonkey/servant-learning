@@ -26,13 +26,6 @@ UserRow
     deriving Show
 |]
 
-share [mkPersist sqlSettings, mkMigrate "migrateTrack"] [persistLowerCase|
-TrackRow
-    _name String
-    _url String
-    deriving Show
-|]
-
 -- Api models
 
 -- User
@@ -48,15 +41,10 @@ instance FromJSON User
 userToUser :: UserRow -> User
 userToUser UserRow{..} = User { name = userRowName, email = userRowEmail }
 
--- Track
+validEmail :: String -> Bool
+validEmail email = email /= ""
 
--- data Track = Track
---     { name :: String
---     , url :: String
---     } deriving (Eq, Show, Generic)
--- 
--- instance ToJSON Track
--- instance FromJSON Track
--- 
--- trackRowToTrack :: TrackRow -> Track
--- trackRowToTrack TrackRow{..} = Track { name = trackRowName, track = trackRowurl }
+userToRow :: User -> Maybe UserRow
+userToRow User{..}
+  | name /= "" && validEmail(email) = Just UserRow { userRowName = name, userRowEmail = email }
+  | otherwise = Nothing

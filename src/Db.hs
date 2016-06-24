@@ -17,4 +17,3 @@ runDb query = do
 doMigrations :: SqlPersistT IO ()
 doMigrations = do 
   runMigration migrateUser
-  runMigration migrateTrack
