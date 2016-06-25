@@ -14,20 +14,25 @@ import           Network.Wai                 (Application)
 import           Servant
 
 import           Config                      (App (..), Config (..))
-import           Models
 
 import           Api.User
+import           Api.Track
+
+type FinalAPI = UserAPI :<|> TrackAPI
+
+finalServer :: ServerT FinalAPI App
+finalServer = userServer :<|> trackServer
 
 -- | This is the function we export to run our 'UserAPI'. Given
 -- a 'Config', we return a WAI 'Application' which any WAI compliant server
 -- can run.
-personApp :: Config -> Application
-personApp cfg = serve (Proxy :: Proxy UserAPI) (readerServer cfg)
+finalApp :: Config -> Application
+finalApp cfg = serve (Proxy :: Proxy FinalAPI) (readerServer cfg)
 
 -- | This functions tells Servant how to run the 'App' monad with our
 -- 'server' function.
-readerServer :: Config -> Server UserAPI
-readerServer cfg = enter (convertApp cfg) userServer
+readerServer :: Config -> Server FinalAPI
+readerServer cfg = enter (convertApp cfg) finalServer
 
 -- | This function converts our 'App' monad into the @ExceptT ServantErr
 -- IO@ monad that Servant's 'enter' function needs in order to run the
@@ -48,7 +53,7 @@ files = serveDirectory "assets"
 -- two different APIs and applications. This is a powerful tool for code
 -- reuse and abstraction! We need to put the 'Raw' endpoint last, since it
 -- always succeeds.
-type AppAPI = UserAPI :<|> Raw
+type AppAPI = FinalAPI :<|> Raw
 
 appApi :: Proxy AppAPI
 appApi = Proxy

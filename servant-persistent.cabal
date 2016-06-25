@@ -3,7 +3,6 @@ version:             0.2.0.0
 synopsis:            Brief example on using persistent with servant
 description:         Brief example on using persistent with servant
 license:             MIT
-license-file:        LICENSE
 author:              Matt Parsons
 maintainer:          parsonsmatt@gmail.com
 copyright:           2016 Matt Parsons
@@ -39,9 +38,11 @@ library
         src
     exposed-modules:
         Config
-      , Models
+      , Models.User
+      , Models.Track
       , Api
       , Api.User
+      , Api.Track
       , Db
     build-depends: 
         base >= 4.7 && < 4.9

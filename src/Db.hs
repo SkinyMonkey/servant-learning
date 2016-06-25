@@ -7,7 +7,8 @@ import Control.Monad.IO.Class
 import Database.Persist.Sql
 import Config
 
-import Models
+import Models.Track
+import Models.User
 
 runDb :: (MonadReader Config m, MonadIO m) => SqlPersistT IO b -> m b
 runDb query = do
